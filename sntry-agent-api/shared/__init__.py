@@ -1,0 +1,1 @@
+# Shared utilities and common interfaces for AI Agent Framework

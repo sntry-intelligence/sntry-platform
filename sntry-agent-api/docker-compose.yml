@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # Authentication Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/auth_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # Data Pipeline Service
+  data-pipeline-service:
+    build:
+      context: ./services/data-pipeline-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/data_pipeline_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # Fine-tuning Service
+  fine-tuning-service:
+    build:
+      context: ./services/fine-tuning-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/fine_tuning_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # Guardrails Service
+  guardrails-service:
+    build:
+      context: ./services/guardrails-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/guardrails_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # Prompt Engineering Service
+  prompt-engineering-service:
+    build:
+      context: ./services/prompt-engineering-service
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/prompt_eng_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # RL Training Service
+  rl-training-service:
+    build:
+      context: ./services/rl-training-service
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/rl_training_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ai-agent-network
+
+  # Shared Infrastructure
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,data_pipeline_db,fine_tuning_db,guardrails_db,prompt_eng_db,rl_training_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./shared/infrastructure/postgres-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - ai-agent-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-agent-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ai-agent-network:
+    driver: bridge
