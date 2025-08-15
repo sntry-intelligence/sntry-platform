@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+
 from fastapi import FastAPI, Depends
 from shared.interfaces.base_service import BaseService
 from shared.utils.database import get_db
