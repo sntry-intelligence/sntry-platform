@@ -23,8 +23,8 @@
   - Write tests for guardrail enforcement
   - _Requirements: 5.2, 5.5_
 
-- [ ] 3. Build data management infrastructure
-- [ ] 3.1 Implement data pipeline service
+- [-] 3. Build data management infrastructure
+- [x] 3.1 Implement data pipeline service
   - Create data ingestion endpoints for various formats
   - Build data cleaning and preprocessing pipelines
   - Implement data quality validation rules
@@ -32,7 +32,7 @@
   - Write integration tests for data flows
   - _Requirements: 1.3, 1.4, 7.1, 7.2_
 
-- [ ] 3.2 Set up vector database and knowledge management
+- [-] 3.2 Set up vector database and knowledge management
   - Configure vector database (Pinecone or Weaviate)
   - Implement document chunking strategies
   - Create embedding generation pipeline
