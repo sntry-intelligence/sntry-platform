@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: sntry_ai
+      POSTGRES_USER: sntry_user
+      POSTGRES_PASSWORD: sntry_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sntry_user -d sntry_ai"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/api-gateway:/app
+      - ./shared:/app/shared
+
+  # Agent Management Service
+  agent-management:
+    build:
+      context: .
+      dockerfile: services/agent-management/Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/agent-management:/app
+      - ./shared:/app/shared
+
+  # Workflow Orchestration Service
+  workflow-orchestration:
+    build:
+      context: .
+      dockerfile: services/workflow-orchestration/Dockerfile
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/workflow-orchestration:/app
+      - ./shared:/app/shared
+
+  # Tool Management Service
+  tool-management:
+    build:
+      context: .
+      dockerfile: services/tool-management/Dockerfile
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/tool-management:/app
+      - ./shared:/app/shared
+
+  # Vector Database Service
+  vector-database:
+    build:
+      context: .
+      dockerfile: services/vector-database/Dockerfile
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/vector-database:/app
+      - ./shared:/app/shared
+
+  # MCP Integration Service
+  mcp-integration:
+    build:
+      context: .
+      dockerfile: services/mcp-integration/Dockerfile
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgresql://sntry_user:sntry_password@postgres:5432/sntry_ai
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/mcp-integration:/app
+      - ./shared:/app/shared
+
+volumes:
+  postgres_data:
+  redis_data:

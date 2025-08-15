@@ -1,0 +1,325 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Agent Domain Models
+model Agent {
+  id               String    @id @default(cuid())
+  name             String
+  description      String?
+  modelId          String    @map("model_id")
+  role             String
+  orchestrationType String   @map("orchestration_type")
+  status           AgentStatus @default(CREATED)
+  configuration    Json
+  deploymentInfo   Json?     @map("deployment_info")
+  metadata         Json      @default("{}")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  workflows        Workflow[]
+  tools            Tool[]
+  conversations    ConversationSession[]
+  evaluations      Evaluation[]
+
+  @@map("agents")
+}
+
+enum AgentStatus {
+  CREATED
+  DEPLOYING
+  DEPLOYED
+  FAILED
+  STOPPED
+}
+
+// Workflow Domain Models
+model Workflow {
+  id          String         @id @default(cuid())
+  agentId     String         @map("agent_id")
+  name        String
+  description String?
+  type        WorkflowType
+  definition  Json
+  status      WorkflowStatus @default(CREATED)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  agent       Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  executions  WorkflowExecution[]
+
+  @@map("workflows")
+}
+
+enum WorkflowType {
+  SEQUENTIAL
+  PARALLEL
+  LOOP
+  DYNAMIC
+}
+
+enum WorkflowStatus {
+  CREATED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  FAILED
+}
+
+model WorkflowExecution {
+  id          String            @id @default(cuid())
+  workflowId  String            @map("workflow_id")
+  status      ExecutionStatus   @default(PENDING)
+  parameters  Json              @default("{}")
+  results     Json              @default("{}")
+  currentStep Int               @default(0) @map("current_step")
+  startTime   DateTime?         @map("start_time")
+  endTime     DateTime?         @map("end_time")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  workflow    Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@map("workflow_executions")
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Tool Domain Models
+model Tool {
+  id               String     @id @default(cuid())
+  agentId          String     @map("agent_id")
+  name             String
+  description      String?
+  functionSignature Json      @map("function_signature")
+  connectionDetails Json      @map("connection_details")
+  securityPolicy   Json       @map("security_policy")
+  mcpServerId      String?    @map("mcp_server_id")
+  status           ToolStatus @default(REGISTERED)
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  agent            Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  mcpServer        MCPServer? @relation(fields: [mcpServerId], references: [id])
+  invocations      ToolInvocation[]
+
+  @@map("tools")
+}
+
+enum ToolStatus {
+  REGISTERED
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model ToolInvocation {
+  id          String    @id @default(cuid())
+  toolId      String    @map("tool_id")
+  parameters  Json      @default("{}")
+  context     Json      @default("{}")
+  result      Json?
+  status      String    @default("pending")
+  duration    Int?      // milliseconds
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Relations
+  tool        Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@map("tool_invocations")
+}
+
+// Conversation Domain Models
+model ConversationSession {
+  id           String        @id @default(cuid())
+  agentId      String        @map("agent_id")
+  userId       String        @map("user_id")
+  status       SessionStatus @default(ACTIVE)
+  context      Json          @default("{}")
+  metadata     Json          @default("{}")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  lastActivity DateTime      @default(now()) @map("last_activity")
+
+  // Relations
+  agent        Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@map("conversation_sessions")
+}
+
+enum SessionStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+model Message {
+  id            String              @id @default(cuid())
+  sessionId     String              @map("session_id")
+  role          MessageRole
+  content       String
+  metadata      Json                @default("{}")
+  toolCalls     Json?               @map("tool_calls")
+  createdAt     DateTime            @default(now()) @map("created_at")
+
+  // Relations
+  session       ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+  TOOL
+}
+
+// Vector Store Domain Models
+model VectorStore {
+  id            String            @id @default(cuid())
+  name          String
+  type          VectorStoreType
+  configuration Json
+  status        VectorStoreStatus @default(CREATED)
+  statistics    Json              @default("{}")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  embeddings    Embedding[]
+
+  @@map("vector_stores")
+}
+
+enum VectorStoreType {
+  VERTEX_AI
+  PINECONE
+  WEAVIATE
+  QDRANT
+}
+
+enum VectorStoreStatus {
+  CREATED
+  INITIALIZING
+  READY
+  ERROR
+  DELETED
+}
+
+model Embedding {
+  id            String      @id @default(cuid())
+  vectorStoreId String      @map("vector_store_id")
+  documentId    String      @map("document_id")
+  chunkIndex    Int         @map("chunk_index")
+  content       String
+  metadata      Json        @default("{}")
+  vector        Float[]     // Vector embedding
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  vectorStore   VectorStore @relation(fields: [vectorStoreId], references: [id], onDelete: Cascade)
+
+  @@unique([vectorStoreId, documentId, chunkIndex])
+  @@map("embeddings")
+}
+
+// MCP Integration Models
+model MCPServer {
+  id                    String           @id @default(cuid())
+  name                  String           @unique
+  endpointUrl           String           @map("endpoint_url")
+  authenticationDetails Json             @map("authentication_details")
+  capabilities          Json             @default("{}")
+  securityPolicy        Json             @map("security_policy")
+  status                MCPServerStatus  @default(REGISTERED)
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  tools                 Tool[]
+
+  @@map("mcp_servers")
+}
+
+enum MCPServerStatus {
+  REGISTERED
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+// Evaluation Domain Models
+model Evaluation {
+  id              String          @id @default(cuid())
+  agentId         String          @map("agent_id")
+  name            String
+  description     String?
+  testDatasetId   String?         @map("test_dataset_id")
+  metrics         Json            @default("{}")
+  status          EvaluationStatus @default(PENDING)
+  results         Json?
+  startTime       DateTime?       @map("start_time")
+  endTime         DateTime?       @map("end_time")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  agent           Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("evaluations")
+}
+
+enum EvaluationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+// User and Authentication Models
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  hashedPassword String @map("hashed_password")
+  isActive  Boolean  @default(true) @map("is_active")
+  isAdmin   Boolean  @default(false) @map("is_admin")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// System Configuration
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_config")
+}
