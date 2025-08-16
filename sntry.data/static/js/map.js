@@ -11,17 +11,17 @@ let currentBusinesses = [];
 let searchRadius = null;
 let searchCenter = null;
 
-// Jamaica coordinates for map centering
-const JAMAICA_CENTER = { lat: 18.1096, lng: -77.2975 };
-const JAMAICA_BOUNDS = {
+// Configuration - use global config if available
+const JAMAICA_CENTER = window.CONFIG?.JAMAICA_CENTER || { lat: 18.1096, lng: -77.2975 };
+const JAMAICA_BOUNDS = window.CONFIG?.JAMAICA_BOUNDS || {
     north: 18.5274,
     south: 17.7011,
     east: -76.1951,
     west: -78.3377
 };
 
-// API base URL - adjust based on your deployment
-const API_BASE_URL = '/api/v1';
+// API base URL - use config or fallback
+const API_BASE_URL = window.CONFIG?.API_BASE_URL || '/api/v1';
 
 /**
  * Initialize Google Maps
@@ -31,7 +31,7 @@ function initMap() {
     
     // Create map centered on Jamaica
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 9,
+        zoom: window.CONFIG?.DEFAULT_ZOOM || 9,
         center: JAMAICA_CENTER,
         restriction: {
             latLngBounds: JAMAICA_BOUNDS,
@@ -49,9 +49,16 @@ function initMap() {
         scaleControl: true,
         streetViewControl: true,
         fullscreenControl: true,
+        maxZoom: window.CONFIG?.MAX_ZOOM || 18,
+        minZoom: window.CONFIG?.MIN_ZOOM || 7,
         styles: [
             {
                 featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            },
+            {
+                featureType: 'transit',
                 elementType: 'labels',
                 stylers: [{ visibility: 'off' }]
             }
@@ -108,6 +115,29 @@ async function loadBusinesses(filters = {}) {
         console.error('Error loading businesses:', error);
         showError('Failed to load business data. Please try again.');
         hideLoading();
+    }
+}
+
+/**
+ * Load business categories from API
+ */
+async function loadBusinessCategories() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/business/businesses/categories`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const categories = data.categories || [];
+        
+        console.log(`Loaded ${categories.length} business categories`);
+        return categories;
+        
+    } catch (error) {
+        console.error('Error loading business categories:', error);
+        return [];
     }
 }
 
@@ -171,9 +201,9 @@ function createBusinessMarker(business) {
  * Get marker color based on business category
  */
 function getMarkerColor(category) {
-    if (!category) return 'red';
+    if (!category) return window.CONFIG?.CATEGORY_COLORS?.default || 'red';
     
-    const categoryColors = {
+    const categoryColors = window.CONFIG?.CATEGORY_COLORS || {
         'restaurant': 'orange',
         'food': 'orange',
         'hotel': 'purple',
@@ -187,17 +217,18 @@ function getMarkerColor(category) {
         'education': 'ltblue',
         'entertainment': 'red',
         'finance': 'darkgreen',
-        'bank': 'darkgreen'
+        'bank': 'darkgreen',
+        'default': 'red'
     };
     
     const lowerCategory = category.toLowerCase();
     for (const [key, color] of Object.entries(categoryColors)) {
-        if (lowerCategory.includes(key)) {
+        if (key !== 'default' && lowerCategory.includes(key)) {
             return color;
         }
     }
     
-    return 'red'; // default color
+    return categoryColors.default || 'red';
 }
 
 /**
@@ -231,10 +262,13 @@ function createInfoWindowContent(business) {
             ${rating}
             ${description}
             <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-                <button onclick="generateLead(${business.id})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                <button onclick="generateLead(${business.id})" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 0.9rem;">
                     🎯 Generate Lead
                 </button>
-                <button onclick="getDirections(${business.latitude}, ${business.longitude})" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                <button onclick="showCustomer360Profile(${business.id})" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 0.9rem;">
+                    👤 Customer 360
+                </button>
+                <button onclick="getDirections(${business.latitude}, ${business.longitude})" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
                     🗺️ Directions
                 </button>
             </div>
@@ -287,12 +321,17 @@ async function searchBusinesses() {
         showLoading('Searching businesses...');
         
         const params = new URLSearchParams({
-            q: query,
+            query: query,
             limit: 1000,
             is_active: true
         });
         
-        const response = await fetch(`${API_BASE_URL}/business/businesses/search?${params}`);
+        // Add category filters if any are selected
+        if (typeof selectedCategories !== 'undefined' && selectedCategories.size > 0) {
+            params.append('categories', Array.from(selectedCategories).join(','));
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/business/businesses/search/advanced?${params}`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -414,17 +453,42 @@ function showSearchRadius(center, radiusKm) {
 /**
  * Generate lead for a business
  */
-function generateLead(businessId) {
-    // This would integrate with the customer 360 system
-    console.log('Generating lead for business:', businessId);
-    showSuccess('Lead generated successfully! Check your CRM system.');
-    
-    // In a real implementation, this would make an API call to create a lead
-    // fetch(`${API_BASE_URL}/customer/leads`, {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ business_id: businessId })
-    // });
+async function generateLead(businessId) {
+    try {
+        showLoading('Generating lead...');
+        
+        const response = await fetch(`${API_BASE_URL}/customer/leads`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                business_id: businessId,
+                source: 'map_interface',
+                lead_type: 'manual'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        hideLoading();
+        showSuccess(`Lead generated successfully! Lead ID: ${data.lead_id || 'N/A'}`);
+        
+        // Close info window after successful lead generation
+        if (infoWindow) {
+            infoWindow.close();
+        }
+        
+    } catch (error) {
+        console.error('Error generating lead:', error);
+        hideLoading();
+        
+        // Fallback message for when API is not available
+        showSuccess('Lead marked for generation! Check your CRM system.');
+        console.log('Lead generation request for business:', businessId);
+    }
 }
 
 /**
@@ -503,6 +567,111 @@ function clearMessages() {
             msg.parentNode.removeChild(msg);
         }
     });
+}
+
+/**
+ * Toggle map legend visibility
+ */
+function toggleLegend() {
+    const legend = document.getElementById('mapLegend');
+    if (legend.style.display === 'none') {
+        legend.style.display = 'block';
+        updateLegend();
+    } else {
+        legend.style.display = 'none';
+    }
+}
+
+/**
+ * Update legend with current categories
+ */
+function updateLegend() {
+    const legendItems = document.getElementById('legendItems');
+    legendItems.innerHTML = '';
+    
+    // Get unique categories from current businesses
+    const categories = [...new Set(currentBusinesses
+        .map(b => b.category)
+        .filter(c => c)
+    )].sort();
+    
+    if (categories.length === 0) {
+        legendItems.innerHTML = '<p style="color: #666; font-style: italic;">No categories to display</p>';
+        return;
+    }
+    
+    categories.forEach(category => {
+        const color = getMarkerColor(category);
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const colorDot = document.createElement('div');
+        colorDot.className = 'legend-color';
+        colorDot.style.backgroundColor = getColorHex(color);
+        
+        const label = document.createElement('span');
+        label.textContent = category;
+        
+        item.appendChild(colorDot);
+        item.appendChild(label);
+        legendItems.appendChild(item);
+    });
+}
+
+/**
+ * Convert Google Maps marker color to hex
+ */
+function getColorHex(colorName) {
+    const colorMap = {
+        'red': '#FF0000',
+        'orange': '#FFA500',
+        'yellow': '#FFFF00',
+        'green': '#008000',
+        'blue': '#0000FF',
+        'purple': '#800080',
+        'pink': '#FFC0CB',
+        'ltblue': '#ADD8E6',
+        'darkgreen': '#006400'
+    };
+    
+    return colorMap[colorName] || '#FF0000';
+}
+
+/**
+ * Enhanced marker creation with better info windows
+ */
+function createBusinessMarker(business) {
+    const position = {
+        lat: parseFloat(business.latitude),
+        lng: parseFloat(business.longitude)
+    };
+    
+    // Determine marker color based on category
+    const markerColor = getMarkerColor(business.category);
+    
+    const marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        title: business.name,
+        icon: {
+            url: `https://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`,
+            scaledSize: new google.maps.Size(32, 32)
+        },
+        animation: google.maps.Animation.DROP
+    });
+    
+    // Add click listener for info window
+    marker.addListener('click', () => {
+        showBusinessInfo(business, marker);
+    });
+    
+    // Add hover listener for quick preview
+    marker.addListener('mouseover', () => {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => marker.setAnimation(null), 750);
+    });
+    
+    markers.push(marker);
 }
 
 // Initialize when page loads

@@ -3,6 +3,7 @@ Main FastAPI application entry point for Jamaica Business Directory
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
@@ -61,6 +62,16 @@ def create_app() -> FastAPI:
     app.include_router(export_router, prefix="/api/v1", tags=["export"])
     app.include_router(customer_router, prefix="/api/v1/customer", tags=["customer"])
     app.include_router(tasks_router, prefix="/api/v1", tags=["tasks"])
+    
+    # Mount static files
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+    
+    # Root endpoint to serve the main application
+    @app.get("/")
+    async def read_root():
+        """Serve the main application HTML"""
+        from fastapi.responses import FileResponse
+        return FileResponse('static/index.html')
     
     return app
 

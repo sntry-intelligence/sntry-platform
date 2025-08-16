@@ -282,6 +282,519 @@
             border: 1px solid #c3e6cb;
         }
 
+        /* Customer 360 Dashboard */
+        .customer360-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .customer360-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .customer360-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .customer-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .customer-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-potential { background: #6c757d; }
+        .badge-qualified { background: #28a745; }
+        .badge-opportunity { background: #007bff; }
+        .badge-customer { background: #17a2b8; }
+        .badge-closed { background: #dc3545; }
+
+        .customer360-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .customer360-body {
+            padding: 20px;
+        }
+
+        .customer360-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .customer360-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .customer360-card h3 {
+            margin: 0 0 15px 0;
+            color: #2a5298;
+            font-size: 1.1rem;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .interactions-list, .businesses-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .interaction-item, .business-item {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .interaction-type, .business-name {
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .interaction-date, .business-category {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .interaction-notes {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .pipeline-info > div {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .activity-feed {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .activity-text {
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .no-activity, .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .customer360-notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            max-width: 300px;
+        }
+
+        .customer-notification {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        .interactions-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .interactions-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .interaction-detail {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .interaction-detail h4 {
+            margin: 0 0 10px 0;
+            color: #2a5298;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #2a5298;
+            color: #2a5298;
+        }
+
+        .btn-outline:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        /* Industry Chart */
+        .industry-chart {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .industry-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .industry-name {
+            flex: 0 0 120px;
+            font-weight: 500;
+        }
+
+        .industry-bar {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .industry-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .industry-percentage {
+            flex: 0 0 40px;
+            text-align: right;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .recommendations-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .recommendation-item {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border-left: 3px solid #28a745;
+        }
+
+        /* Responsive adjustments for customer 360 */
+        @media (max-width: 768px) {
+            .customer360-content {
+                width: 95%;
+                max-height: 95%;
+            }
+
+            .customer360-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .customer360-actions {
+                justify-content: center;
+            }
+
+            .customer360-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .customer360-notifications {
+                right: 10px;
+                max-width: 250px;
+            }
+        }
+
+        /* Lead scoring visualization */
+        .lead-score-high {
+            background-color: #28a745 !important;
+        }
+
+        .lead-score-medium {
+            background-color: #ffc107 !important;
+        }
+
+        .lead-score-low {
+            background-color: #dc3545 !important;
+        }
+
+        .lead-score-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .territory-overlay {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        .territory-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .territory-stat {
+            text-align: center;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .territory-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .territory-stat-label {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        /* Additional UI elements */
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .map-control-btn {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .map-control-btn:hover {
+            background: #f0f0f0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 0.8rem;
+            max-width: 200px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .container {
@@ -290,11 +803,62 @@
             
             .sidebar {
                 width: 100%;
-                height: 300px;
+                height: 350px;
+                order: 2;
             }
             
             .map-container {
-                height: calc(100vh - 380px);
+                height: 400px;
+                order: 1;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .sidebar-section {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .map-controls {
+                top: 5px;
+                right: 5px;
+            }
+
+            .legend {
+                bottom: 10px;
+                left: 10px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-section {
+                padding: 0.75rem;
+            }
+
+            .export-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -363,6 +927,80 @@
                 <button class="btn btn-primary" onclick="searchByLocation()">Search Area</button>
             </div>
 
+            <!-- Advanced Filters -->
+            <div class="sidebar-section">
+                <h3>🔧 Advanced Filters</h3>
+                <div class="filter-group">
+                    <label for="parishFilter">Parish:</label>
+                    <select id="parishFilter" class="filter-select" onchange="applyAdvancedFilters()">
+                        <option value="">All Parishes</option>
+                        <option value="Kingston">Kingston</option>
+                        <option value="St. Andrew">St. Andrew</option>
+                        <option value="St. Catherine">St. Catherine</option>
+                        <option value="Clarendon">Clarendon</option>
+                        <option value="Manchester">Manchester</option>
+                        <option value="St. Elizabeth">St. Elizabeth</option>
+                        <option value="Westmoreland">Westmoreland</option>
+                        <option value="Hanover">Hanover</option>
+                        <option value="St. James">St. James</option>
+                        <option value="Trelawny">Trelawny</option>
+                        <option value="St. Ann">St. Ann</option>
+                        <option value="St. Mary">St. Mary</option>
+                        <option value="Portland">Portland</option>
+                        <option value="St. Thomas">St. Thomas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Data Quality:</label>
+                    <div class="checkbox-group" style="max-height: 120px;">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasPhone" onchange="applyAdvancedFilters()">
+                            <label for="hasPhone">Has Phone Number</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasEmail" onchange="applyAdvancedFilters()">
+                            <label for="hasEmail">Has Email Address</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasWebsite" onchange="applyAdvancedFilters()">
+                            <label for="hasWebsite">Has Website</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="isGeocoded" onchange="applyAdvancedFilters()">
+                            <label for="isGeocoded">Has Location Data</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="minRating">Minimum Rating:</label>
+                    <div class="radius-control">
+                        <input type="range" id="minRating" class="radius-slider" min="0" max="5" step="0.5" value="0" onchange="applyAdvancedFilters()">
+                        <span class="radius-value" id="minRatingValue">Any</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Generation -->
+            <div class="sidebar-section">
+                <h3>🎯 Lead Generation</h3>
+                <div class="filter-group">
+                    <label for="leadScoreSlider">Minimum Lead Score:</label>
+                    <div class="radius-control">
+                        <input type="range" id="leadScoreSlider" class="radius-slider" min="0" max="100" value="50" onchange="updateLeadScoreDisplay()">
+                        <span class="radius-value" id="leadScoreValue">50</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showLeadScoringView()">Score Leads</button>
+                    <button class="btn btn-secondary" onclick="exportQualifiedLeads()">Export Leads</button>
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;">
+                    <div id="leadStats">
+                        <span id="qualifiedLeadsCount">0</span> qualified leads found
+                    </div>
+                </div>
+            </div>
+
             <!-- Export Section -->
             <div class="sidebar-section">
                 <div class="export-section">
@@ -374,6 +1012,43 @@
                         <button class="btn-export" onclick="exportData('kml')">KML</button>
                         <button class="btn-export" onclick="exportData('geojson')">GeoJSON</button>
                     </div>
+                    <div style="margin-top: 0.5rem;">
+                        <button class="btn-export" onclick="exportLeads()" style="width: 100%;">🎯 Export Leads</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Performance Analytics -->
+            <div class="sidebar-section">
+                <h3>📊 Sales Analytics</h3>
+                <div class="stats-panel">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="conversionRate">0%</div>
+                            <div class="stat-label">Conversion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avgLeadScore">0</div>
+                            <div class="stat-label">Avg Lead Score</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showTerritoryAnalysis()">📈 Territory Analysis</button>
+                    <button class="btn btn-secondary" onclick="showSalesPerformance()">📊 Performance</button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="sidebar-section">
+                <h3>⚡ Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="resetAllFilters()">Reset All</button>
+                    <button class="btn btn-secondary" onclick="showExportMenu()">Export Menu</button>
+                </div>
+                <div class="action-buttons" style="margin-top: 0.5rem;">
+                    <button class="btn btn-primary" onclick="createMyMapsExport()">📍 MyMaps</button>
+                    <button class="btn btn-primary" onclick="fitMapToBounds()">🎯 Fit View</button>
                 </div>
             </div>
         </div>
@@ -384,16 +1059,64 @@
                 <p>Loading Jamaica Business Directory...</p>
             </div>
             <div id="map"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="map-control-btn" onclick="fitMapToBounds()" title="Fit all markers in view">
+                    🎯 Fit View
+                </button>
+                <button class="map-control-btn" onclick="toggleLegend()" title="Toggle legend">
+                    📋 Legend
+                </button>
+                <button class="map-control-btn" onclick="showExportMenu()" title="Export options">
+                    📤 Export
+                </button>
+            </div>
+
+            <!-- Map Legend -->
+            <div id="mapLegend" class="legend" style="display: none;">
+                <h4 style="margin: 0 0 8px 0; font-size: 0.9rem;">Business Categories</h4>
+                <div id="legendItems">
+                    <!-- Legend items will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Territory Analysis Overlay -->
+            <div id="territoryOverlay" class="territory-overlay">
+                <h4 style="margin: 0 0 8px 0;">Territory Analysis</h4>
+                <div class="territory-stats">
+                    <div class="territory-stat">
+                        <div class="territory-stat-value" id="territoryBusinessCount">0</div>
+                        <div class="territory-stat-label">Businesses</div>
+                    </div>
+                    <div class="territory-stat">
+                        <div class="territory-stat-value" id="territoryLeadCount">0</div>
+                        <div class="territory-stat-label">Qualified Leads</div>
+                    </div>
+                    <div class="territory-stat">
+                        <div class="territory-stat-value" id="territoryDensity">0</div>
+                        <div class="territory-stat-label">per km²</div>
+                    </div>
+                    <div class="territory-stat">
+                        <div class="territory-stat-value" id="territoryScore">0%</div>
+                        <div class="territory-stat-label">Avg Score</div>
+                    </div>
+                </div>
+                <button onclick="hideTerritory()" style="position: absolute; top: 5px; right: 5px; background: none; border: none; cursor: pointer;">×</button>
+            </div>
         </div>
     </div>
 
     <!-- Google Maps JavaScript API -->
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=places">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw&callback=initMap&libraries=places">
     </script>
 
+    <script src="js/config.js"></script>
     <script src="js/map.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/export.js"></script>
+    <script src="js/leads.js"></script>
+    <script src="js/customer360.js"></script>
 </body>
 </html>
