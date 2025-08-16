@@ -1,0 +1,70 @@
+# FastAPI and web framework dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database dependencies
+sqlalchemy==2.0.23
+alembic==1.13.1
+psycopg[binary]==3.2.9
+geoalchemy2==0.14.2
+
+# Redis and caching
+redis==5.0.1
+hiredis==2.2.3
+
+# Background tasks
+celery==5.3.4
+
+# Web scraping
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Data processing
+pandas==2.1.4
+numpy==1.25.2
+rapidfuzz==3.5.2
+openpyxl==3.1.2
+python-dateutil==2.8.2
+
+# Geocoding and mapping
+googlemaps==4.10.0
+google-api-python-client==2.108.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.1.0
+
+# Address parsing
+postal==1.1.10
+
+# Environment management
+python-dotenv==1.0.0
+
+# HTTP client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Kafka integration
+kafka-python==2.0.2
+aiokafka==0.8.11
+
+# SQL Server integration
+pyodbc==5.0.1
+pymssql==2.2.11
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+httpx==0.25.2
+
+# Development tools
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Logging and monitoring
+structlog==23.2.0
+python-json-logger==2.0.7
+psutil==5.9.6
